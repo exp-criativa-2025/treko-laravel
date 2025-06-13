@@ -6,6 +6,227 @@
         "version": "1.0.0"
     },
     "paths": {
+        "/api/academic-entities": {
+            "get": {
+                "tags": [
+                    "Academic Entities"
+                ],
+                "summary": "Lista todas as entidades acadêmicas",
+                "operationId": "1414c0f4203509f7678b1f3823777d63",
+                "responses": {
+                    "200": {
+                        "description": "Lista de entidades acadêmicas"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Academic Entities"
+                ],
+                "summary": "Cria uma nova entidade acadêmica",
+                "operationId": "b5e1f6a8dc76c888b2b357eb7c2973cd",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "type": {
+                                        "type": "string",
+                                        "example": "university"
+                                    },
+                                    "fantasy_name": {
+                                        "type": "string",
+                                        "example": "Minha Universidade"
+                                    },
+                                    "cnpj": {
+                                        "type": "string",
+                                        "example": "12.345.678/0001-90"
+                                    },
+                                    "foundation_date": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "2020-01-01"
+                                    },
+                                    "status": {
+                                        "type": "string",
+                                        "example": "active"
+                                    },
+                                    "cep": {
+                                        "type": "string",
+                                        "example": "12345-678"
+                                    },
+                                    "user_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Entidade criada com sucesso"
+                    },
+                    "422": {
+                        "description": "Erro de validação"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/academic-entities/{id}": {
+            "get": {
+                "tags": [
+                    "Academic Entities"
+                ],
+                "summary": "Obtém uma entidade acadêmica específica",
+                "operationId": "getAcademicEntity",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID da entidade acadêmica",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Entidade encontrada",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AcademicEntity"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Acesso não autorizado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Acesso não autorizado."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Entidade não encontrada"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Academic Entities"
+                ],
+                "summary": "Atualiza uma entidade acadêmica",
+                "operationId": "updateAcademicEntity",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID da entidade acadêmica",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "description": "Dados atualizados da entidade acadêmica",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/AcademicEntity"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Entidade atualizada com sucesso",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AcademicEntity"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Acesso não autorizado"
+                    },
+                    "422": {
+                        "description": "Erro de validação"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Academic Entities"
+                ],
+                "summary": "Remove uma entidade acadêmica",
+                "operationId": "deleteAcademicEntity",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID da entidade acadêmica",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Entidade removida com sucesso"
+                    },
+                    "403": {
+                        "description": "Acesso não autorizado"
+                    },
+                    "404": {
+                        "description": "Entidade não encontrada"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/users": {
             "get": {
                 "tags": [
@@ -21,7 +242,81 @@
             }
         }
     },
+    "components": {
+        "schemas": {
+            "AcademicEntity": {
+                "title": "Academic Entity",
+                "required": [
+                    "type",
+                    "fantasy_name",
+                    "cnpj",
+                    "foundation_date",
+                    "status",
+                    "cep",
+                    "user_id"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "type": {
+                        "type": "string",
+                        "enum": [
+                            "school",
+                            "university",
+                            "research_center"
+                        ],
+                        "example": "university"
+                    },
+                    "fantasy_name": {
+                        "type": "string",
+                        "example": "Universidade Exemplo"
+                    },
+                    "cnpj": {
+                        "type": "string",
+                        "example": "12.345.678/0001-90"
+                    },
+                    "foundation_date": {
+                        "type": "string",
+                        "format": "date",
+                        "example": "2020-01-01"
+                    },
+                    "status": {
+                        "type": "string",
+                        "enum": [
+                            "active",
+                            "inactive",
+                            "pending"
+                        ],
+                        "example": "active"
+                    },
+                    "cep": {
+                        "type": "string",
+                        "example": "12345-678"
+                    },
+                    "user_id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            }
+        }
+    },
     "tags": [
+        {
+            "name": "Academic Entities",
+            "description": "Operações relacionadas a entidades acadêmicas"
+        },
         {
             "name": "Users",
             "description": "Users"
