@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\AcademicEntity;
 use Illuminate\Http\Request;
-
+use Illuminate\Support\Facades\Auth;
 /**
  * @OA\Info(
  * title="API Academic Entities", 
@@ -56,9 +56,9 @@ class AcademicEntityController extends Controller
      */
     public function index()
     {
-        $users = $this->academicEntity->all();
+        $academicEntities = $this->academicEntity->where('user_id', Auth::id())->get();
+        return response()->json($academicEntities, 200);  
 
-        return response()->json($academicEntities, 200);   
     }
 
      /**
@@ -145,7 +145,6 @@ class AcademicEntityController extends Controller
     public function show(AcademicEntity $academicEntity)
     {
         if ($academicEntity->user_id !== Auth::id()) {
-            // Retorna um erro 403 (Forbidden) se o acesso não for autorizado.
             return response()->json(['message' => 'Acesso não autorizado.'], 403);
         }
 
@@ -197,7 +196,7 @@ class AcademicEntityController extends Controller
             'type' => 'sometimes|string|max:255',
             'fantasy_name' => 'sometimes|string|max:255',
             'cnpj' => [
-                'required',
+                'sometimes',
                 'string',
                 'max:255',
                 'unique:academic_entities,cnpj,'.$academicEntity->id
@@ -209,7 +208,6 @@ class AcademicEntityController extends Controller
         ]);
 
         $academicEntity->update($validatedData);
-
         return response()->json($academicEntity, 200);
     }
 
