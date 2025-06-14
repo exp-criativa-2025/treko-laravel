@@ -2,8 +2,34 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\AcademicEntity;
 use App\Models\Campaign;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+
+/**
+ * @OA\Info(
+ * title="API Campaigns",
+ * version="1.0"
+ * )
+ */
+
+ /**
+ * @OA\Tag(
+ *     name="Campaigns",
+ *     description="Operações relacionadas a campanhas"
+ * )
+ * @OA\Schema(
+ *     schema="Campaign",
+ *     type="object",
+ *     @OA\Property(property="id", type="integer", format="int64"),
+ *     @OA\Property(property="name", type="string"),
+ *     @OA\Property(property="goal", type="number", format="float"),
+ *     @OA\Property(property="start_date", type="string", format="date"),
+ *     @OA\Property(property="end_date", type="string", format="date"),
+ *     @OA\Property(property="academic_entity_id", type="integer", format="int64")
+ * )
+ * */
 
 class CampaignController extends Controller
 {

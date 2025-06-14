@@ -68,7 +68,8 @@ class DonationController extends Controller
      *             type="object",
      *             @OA\Property(property="donated", type="number", format="float", example=100.50),
      *             @OA\Property(property="date", type="string", format="date-time", example="2023-01-01 12:00:00"),
-     *             @OA\Property(property="campaign_id", type="integer", example=1)
+     *             @OA\Property(property="campaign_id", type="integer", example=1),
+     *             @OA\Property(property="user_id", type="integer", example=1)
      *         )
      *     ),
      *     @OA\Response(
@@ -105,7 +106,7 @@ class DonationController extends Controller
     }
 
 
-        /**
+    /**
      * @OA\Get(
      *     path="/api/donations/{id}",
      *     tags={"Donations"},
@@ -137,7 +138,7 @@ class DonationController extends Controller
      *     security={{"bearerAuth":{}}}
      * )
      */
-        public function show(Donation $donation)
+    public function show(Donation $donation)
     {
         if ($donation->user_id !== Auth::id()) {
             return response()->json(['message' => 'Acesso não autorizado.'], 403);
@@ -146,7 +147,7 @@ class DonationController extends Controller
         return response()->json($donation, 200);
     }
 
-     /**
+    /**
      * @OA\Put(
      *     path="/api/donations/{id}",
      *     tags={"Donations"},
@@ -203,7 +204,7 @@ class DonationController extends Controller
         return response()->json($donation, 200);
     }
 
-    
+
     /**
      * @OA\Delete(
      *     path="/api/donations/{id}",
@@ -231,7 +232,7 @@ class DonationController extends Controller
      *     security={{"bearerAuth":{}}}
      * )
      */
-     public function destroy(string $id)
+    public function destroy(string $id)
     {
         $donation = Donation::find($id);
 

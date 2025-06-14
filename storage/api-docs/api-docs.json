@@ -1,8 +1,8 @@
 {
     "openapi": "3.0.0",
     "info": {
-        "title": "My Laravel API",
-        "description": "This is the API documentation for my Laravel app",
+        "title": "Treko API",
+        "description": "Treko API documentation",
         "version": "1.0.0"
     },
     "paths": {
@@ -241,6 +241,131 @@
                 }
             }
         },
+        "/api/campaigns": {
+            "get": {
+                "tags": [
+                    "Campaigns"
+                ],
+                "summary": "Lista todas as campanhas",
+                "operationId": "f63bfb37edf1acfd021c50961b734ec0",
+                "responses": {
+                    "200": {
+                        "description": "Lista de campanhas",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Campaign"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Campaigns"
+                ],
+                "summary": "Cria uma nova campanha",
+                "operationId": "272d9b28b56c8e18d5ef4c7440a05def",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Campanha de Doação"
+                                    },
+                                    "goal": {
+                                        "type": "string",
+                                        "example": "Arrecadar recursos para pesquisa"
+                                    },
+                                    "start_date": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "2023-01-01"
+                                    },
+                                    "end_date": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "2023-12-31"
+                                    },
+                                    "academic_entity_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Campanha criada com sucesso",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Campaign"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Erro de validação"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/campaigns/{id}": {
+            "delete": {
+                "tags": [
+                    "Campaigns"
+                ],
+                "summary": "Remove uma campanha",
+                "operationId": "deleteCampaign",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID da campanha",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Campanha removida com sucesso"
+                    },
+                    "403": {
+                        "description": "Acesso não autorizado"
+                    },
+                    "404": {
+                        "description": "Campanha não encontrada"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/donations": {
             "get": {
                 "tags": [
@@ -292,6 +417,10 @@
                                         "example": "2023-01-01 12:00:00"
                                     },
                                     "campaign_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "user_id": {
                                         "type": "integer",
                                         "example": 1
                                     }
@@ -565,6 +694,34 @@
                 },
                 "type": "object"
             },
+            "Campaign": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "goal": {
+                        "type": "number",
+                        "format": "float"
+                    },
+                    "start_date": {
+                        "type": "string",
+                        "format": "date"
+                    },
+                    "end_date": {
+                        "type": "string",
+                        "format": "date"
+                    },
+                    "academic_entity_id": {
+                        "type": "integer",
+                        "format": "int64"
+                    }
+                },
+                "type": "object"
+            },
             "Donation": {
                 "required": [
                     "donated",
@@ -611,6 +768,10 @@
         {
             "name": "Academic Entities",
             "description": "Operações relacionadas a entidades acadêmicas"
+        },
+        {
+            "name": "Campaigns",
+            "description": "Operações relacionadas a campanhas"
         },
         {
             "name": "Users",
