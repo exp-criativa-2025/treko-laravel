@@ -894,6 +894,7 @@
                 },
                 "type": "object"
             },
+<<<<<<< HEAD
             "User": {
                 "title": "User",
                 "required": [
@@ -932,6 +933,8 @@
                 },
                 "type": "object"
             },
+=======
+>>>>>>> 188fca9 (fix conflicts)
             "Campaign": {
                 "properties": {
                     "id": {
@@ -1012,6 +1015,7 @@
             "description": "Operações relacionadas a campanhas"
         },
         {
+<<<<<<< HEAD
             "name": "Register",
             "description": "Register"
         },
@@ -1024,6 +1028,8 @@
             "description": "Logout"
         },
         {
+=======
+>>>>>>> 188fca9 (fix conflicts)
             "name": "Users",
             "description": "Users"
         },
