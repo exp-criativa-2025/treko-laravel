@@ -26,7 +26,7 @@ class ApiAuthenticatedSessionController extends Controller
 
         return response()->json([
             'data' => $user,
-            'message' => __('system.auth.registered'),
+            'message' => __('Registro realizado com sucesso'),
         ]);
     }
 
@@ -41,7 +41,7 @@ class ApiAuthenticatedSessionController extends Controller
 
         return response()->json([
             'data' => $user,
-            'message' => __('system.auth.logged_in'),
+            'message' => __('Você fez login'),
         ]);
     }
 
@@ -49,7 +49,7 @@ class ApiAuthenticatedSessionController extends Controller
     {
         return response()->json([
             'data' => LoadAuthUserAction::execute(),
-            'message' => Auth::check() ? __('system.auth.validated') : __('system.auth.not_validated'),
+            'message' => Auth::check() ? __('Você está autenticado') : __('Você não está autenticado'),
         ]);
     }
 
@@ -58,7 +58,7 @@ class ApiAuthenticatedSessionController extends Controller
         $request->user()->currentAccessToken()->delete();
 
         return response()->json([
-            'message' => __('system.auth.logged_out'),
+            'message' => __('Você fez logout'),
         ]);
     }
 
@@ -67,7 +67,7 @@ class ApiAuthenticatedSessionController extends Controller
         ValidateResetCodeAction::execute($request);
 
         return response()->json([
-            'message' => __('system.passwords.valid_reset_code'),
+            'message' => __('Recuperação de senha válida'),
         ]);
     }
 
@@ -76,7 +76,7 @@ class ApiAuthenticatedSessionController extends Controller
         ResetPasswordAction::execute($request);
 
         return response()->json([
-            'message' => __('system.passwords.reset'),
+            'message' => __('Recuperação de senha realizada com sucesso'),
         ]);
     }
 
@@ -91,14 +91,14 @@ class ApiAuthenticatedSessionController extends Controller
 
         if (!password_verify($request->get('current_password'), $user->password)) {
             return response()->json([
-                'message' => __('system.auth.current_password_invalid'),
+                'message' => __('Senha atual incorreta'),
             ], 422);
         }
 
         $user->update(['password' => bcrypt($request->get('new_password'))]);
 
         return response()->json([
-            'message' => __('system.auth.password_changed'),
+            'message' => __('Senha alterada com sucesso'),
         ]);
     }
 }
