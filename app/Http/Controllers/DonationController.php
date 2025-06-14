@@ -53,10 +53,10 @@ class DonationController extends Controller
      *     security={{"bearerAuth":{}}}
      * )
      */
+
     public function index()
     {
-        $donations = $this->donation->where('user_id', Auth::id())->get();
-        return response()->json($donations, 200);
+        return response()->json(Donation::all(), 200);
     }
 
     /**
