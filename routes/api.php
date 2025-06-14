@@ -18,3 +18,6 @@ Route::middleware(['api'])->group(function () {
 //rotas de entidades acadêmicas
 require __DIR__.'/academic.php';
 
+//rotas de doações
+require __DIR__.'/donation.php';
+

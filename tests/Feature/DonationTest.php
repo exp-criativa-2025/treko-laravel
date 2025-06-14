@@ -2,7 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Models\Donation;
+use App\Models\AcademicEntity;
 use App\Models\User;
 use App\Models\Campaign; 
 use Illuminate\Foundation\Testing\RefreshDatabase;
