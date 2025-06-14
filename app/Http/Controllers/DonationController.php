@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Donation;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 /**
  * @OA\Tag(
@@ -246,5 +248,76 @@ class DonationController extends Controller
 
         $donation->delete();
         return response()->json(null, 204);
+    }
+
+
+    /**
+     * @OA\Get(
+     *     path="/api/donations/campaign/{campaignId}",
+     *     tags={"Donations"},
+     *     summary="Lista doações por campanha",
+     *     @OA\Parameter(
+     *         name="campaignId",
+     *         in="path",
+     *         required=true,
+     *         description="ID da campanha",
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Lista de doações para a campanha",
+     *         @OA\JsonContent(
+     *             type="array",
+     *             @OA\Items(ref="#/components/schemas/Donation")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Nenhuma doação encontrada para esta campanha"
+     *     ),
+     * )
+     */
+    public function donationsByCampaign($campaignId)
+    {
+        $donations = Donation::where('campaign_id', $campaignId)->get();
+
+        if ($donations->isEmpty()) {
+            return response()->json(['message' => 'Nenhuma doação encontrada para esta campanha.'], 404);
+        }
+
+        return response()->json($donations, 200);
+    }
+
+    /**
+     * @OA\Get(
+     *     path="/api/donations/donationsDailyTotalsOnYear",
+     *     tags={"Donations"},
+     *     summary="Lista doações diárias totais no ano atual",
+     *     @OA\Response(
+     *         response=200,
+     *         description="Lista de totais diários de doações",
+     *         @OA\JsonContent(
+     *             type="array",
+     *             @OA\Items(
+     *                 @OA\Property(property="date", type="string", format="date"),
+     *                 @OA\Property(property="total", type="number", format="float")
+     *             )
+     *         )
+     *     ),
+     * )
+     */
+
+    public function donationsDailyTotalsOnYear()
+    {
+        $year = Carbon::now()->year;
+
+        $donations = DB::table('donations')
+            ->select(DB::raw('DATE(date) as date'), DB::raw('SUM(donated) as total'))
+            ->whereYear('date', $year)
+            ->groupBy(DB::raw('DATE(date)'))
+            ->orderBy('date')
+            ->get();
+
+        return response()->json($donations, 200);
     }
 }

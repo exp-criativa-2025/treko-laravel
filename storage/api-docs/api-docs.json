@@ -624,6 +624,78 @@
                     }
                 ]
             }
+        },
+        "/api/donations/campaign/{campaignId}": {
+            "get": {
+                "tags": [
+                    "Donations"
+                ],
+                "summary": "Lista doações por campanha",
+                "operationId": "19e582f635d38f58421e494f66ae0b4a",
+                "parameters": [
+                    {
+                        "name": "campaignId",
+                        "in": "path",
+                        "description": "ID da campanha",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Lista de doações para a campanha",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Donation"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Nenhuma doação encontrada para esta campanha"
+                    }
+                }
+            }
+        },
+        "/api/donations/donationsDailyTotalsOnYear": {
+            "get": {
+                "tags": [
+                    "Donations"
+                ],
+                "summary": "Lista doações diárias totais no ano atual",
+                "operationId": "fe818a60bbd509037683e5ff3be49e18",
+                "responses": {
+                    "200": {
+                        "description": "Lista de totais diários de doações",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "properties": {
+                                            "date": {
+                                                "type": "string",
+                                                "format": "date"
+                                            },
+                                            "total": {
+                                                "type": "number",
+                                                "format": "float"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     },
     "components": {
