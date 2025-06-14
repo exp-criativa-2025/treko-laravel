@@ -8,6 +8,9 @@ use Illuminate\Support\Facades\Route;
 
 // Rotas protegidas (com autenticação)
 Route::middleware(['auth:sanctum'])->group(function () {
+    Route::get('donations/donationsDailyTotalsOnYear', [DonationController::class, 'donationsDailyTotalsOnYear'])
+        ->name('donations.dailyTotalsOnYear');
+        
     Route::apiResource('donations', DonationController::class)
         ->parameters(['donations' => 'donation'])
         ->names([
@@ -17,4 +20,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
             'update' => 'donations.update',
             'destroy' => 'donations.destroy',
         ]);
+
+
+    Route::get('donations/donationsByCampaign/{campaignId}', [DonationController::class, 'donationsByCampaign'])
+        ->name('donations.byCampaign');
 });
