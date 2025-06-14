@@ -8,8 +8,11 @@ Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
     return $request->user();
 });
 
-require __DIR__.'/auth.php';
+Route::middleware(['api'])->group(function () {
+    Route::post('/register', [App\Http\Controllers\Auth\ApiAuthenticatedSessionController::class, 'register'])
+        ->name('api.register');
+    Route::post('/login', [App\Http\Controllers\Auth\ApiAuthenticatedSessionController::class, 'login'])
+        ->name('api.login');
+});
 
-//rotas de entidades acadêmicas
-require __DIR__.'/academic.php';
 
