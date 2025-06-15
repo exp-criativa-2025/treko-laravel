@@ -21,3 +21,6 @@ require __DIR__.'/academic.php';
 //rotas de doações
 require __DIR__.'/donation.php';
 
+//rotas de campanhas
+require __DIR__.'/campaign.php';
+
