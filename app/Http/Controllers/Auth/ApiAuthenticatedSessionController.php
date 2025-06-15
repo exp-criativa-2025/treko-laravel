@@ -74,6 +74,7 @@ class ApiAuthenticatedSessionController extends Controller
 
         return response()->json([
             'data' => $user,
+            'status' => 201,
             'message' => __('Registro realizado com sucesso'),
         ]);
     }

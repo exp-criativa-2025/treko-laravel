@@ -98,7 +98,7 @@ class CampaignController extends Controller
     {
         $validatedData = $request->validate([
             'name' => 'required|string|max:255',
-            'goal' => 'required|string',
+            'goal' => 'required|',
             'start_date' => 'required|date',
             'end_date' => 'required|date|after:start_date',
             'academic_entity_id' => 'required|exists:academic_entities,id'
