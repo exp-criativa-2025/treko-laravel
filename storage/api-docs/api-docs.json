@@ -894,6 +894,44 @@
                 },
                 "type": "object"
             },
+            "User": {
+                "title": "User",
+                "required": [
+                    "id",
+                    "name",
+                    "email",
+                    "token"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "John Doe"
+                    },
+                    "email": {
+                        "type": "string",
+                        "format": "email",
+                        "example": "john.doe@example.com"
+                    },
+                    "cpf": {
+                        "type": "string",
+                        "example": "123.456.789-00"
+                    },
+                    "phone": {
+                        "type": "string",
+                        "example": "+55 11 91234-5678"
+                    },
+                    "password": {
+                        "type": "string",
+                        "format": "password",
+                        "example": "password123"
+                    }
+                },
+                "type": "object"
+            },
             "Campaign": {
                 "properties": {
                     "id": {
@@ -986,21 +1024,6 @@
             "description": "Logout"
         },
         {
-<<<<<<< HEAD
-            "name": "Register",
-            "description": "Register"
-        },
-        {
-            "name": "Login",
-            "description": "Login"
-        },
-        {
-            "name": "Logout",
-            "description": "Logout"
-        },
-        {
-=======
->>>>>>> 188fca9 (fix conflicts)
             "name": "Users",
             "description": "Users"
         },

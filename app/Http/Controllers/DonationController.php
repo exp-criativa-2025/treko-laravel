@@ -7,6 +7,8 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use App\Enums\UserRole;
 
 /**
  * @OA\Tag(
@@ -56,10 +58,30 @@ class DonationController extends Controller
 
     public function index()
     {
-        $donations = Donation::with(['user', 'campaign'])
+
+        $currentUser = DB::table('users')
+            ->where('id', Auth::id())
+            ->first();
+        if ($currentUser->role === UserRole::REPRESENTATIVE->value) {
+            $academicEntities = DB::table('academic_entities')
+                ->where('user_id', Auth::id())
+                ->pluck('id');
+
+            $donations = Donation::with(['user', 'campaign.academicEntity'])
+                ->whereIn('campaign_id', function ($query) use ($academicEntities) {
+                    $query->select('id')
+                        ->from('campaigns')
+                        ->whereIn('academic_entity_id', $academicEntities);
+                })
+                ->orderBy('date', 'desc')
+                ->get();
+
+            return response()->json($donations, 200);
+        }
+
+        $donations = Donation::with(['user', 'campaign.academicEntity'])
             ->orderBy('date', 'desc')
             ->get();
-
         return response()->json($donations, 200);
     }
 
