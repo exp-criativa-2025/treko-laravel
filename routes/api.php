@@ -19,3 +19,6 @@ Route::middleware(['api'])->group(function () {
 //rotas de doações
 require __DIR__.'/donation.php';
 
+//rotas de campanhas
+require __DIR__.'/campaign.php';
+
