@@ -15,6 +15,13 @@ Route::middleware(['api'])->group(function () {
         ->name('api.login');
 });
 
+Route::middleware(['auth:sanctum'])->group(function () {
+    Route::post('/logout', [App\Http\Controllers\Auth\ApiAuthenticatedSessionController::class, 'logout'])
+    ->name('api.logout');
+});
+
+//rotas de entidades acadêmicas
+require __DIR__.'/academic.php';
 
 //rotas de doações
 require __DIR__.'/donation.php';
