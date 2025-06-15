@@ -24,4 +24,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
     
     Route::post('academic-entities/{id}/activate', [AcademicEntityController::class, 'activate'])
         ->name('academic-entities.activate');
+
+    Route::get('academic-entities/type/academic-center', 
+        [AcademicEntityController::class, 'getAcademicCenters'])
+        ->name('academic-entities.academic-centers');
 });
