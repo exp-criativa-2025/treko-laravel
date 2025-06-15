@@ -28,4 +28,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('academic-entities/type/academic-center', 
         [AcademicEntityController::class, 'getAcademicCenters'])
         ->name('academic-entities.academic-centers');
+
+    Route::get('academic-entities/type/central-directories', 
+        [AcademicEntityController::class, 'getCentralDirectories'])
+        ->name('academic-entities.central-directories');
 });

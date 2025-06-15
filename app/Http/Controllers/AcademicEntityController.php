@@ -86,6 +86,30 @@ public function getAcademicCenters()
     }
 }
 
+public function getCentralDirectories()
+{
+    try {
+        if (!Auth::check()) {
+            return response()->json(['message' => 'Não autorizado'], 401);
+        }
+
+        $userId = Auth::id();
+        
+        $academicEntities = AcademicEntity::where('type', 'CENTRAL_DIRECTORY')
+            ->where('user_id', $userId)
+            ->get();
+
+        return response()->json($academicEntities);
+
+    } catch (\Exception $e) {
+        \Log::error('Erro em getAcademicCenters: '.$e->getMessage());
+        return response()->json([
+            'message' => 'Erro no servidor',
+            'error' => $e->getMessage()
+        ], 500);
+    }
+}
+
     /**
      * @OA\Post(
      *     path="/api/academic-entities",
