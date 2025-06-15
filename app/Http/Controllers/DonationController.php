@@ -56,7 +56,11 @@ class DonationController extends Controller
 
     public function index()
     {
-        return response()->json(Donation::all(), 200);
+        $donations = Donation::with(['user', 'campaign'])
+            ->orderBy('date', 'desc')
+            ->get();
+
+        return response()->json($donations, 200);
     }
 
     /**
@@ -316,8 +320,21 @@ class DonationController extends Controller
             ->whereYear('date', $year)
             ->groupBy(DB::raw('DATE(date)'))
             ->orderBy('date')
-            ->get();
+            ->pluck('total', 'date');
 
-        return response()->json($donations, 200);
+        $start = Carbon::createFromDate($year, 1, 1);
+        $end = Carbon::now();
+
+        $fullYearData = collect();
+
+        for ($date = $start->copy(); $date->lte($end); $date->addDay()) {
+            $formattedDate = $date->toDateString();
+            $fullYearData->push([
+                'date' => $formattedDate,
+                'total' => (float) ($donations[$formattedDate] ?? 0),
+            ]);
+        }
+
+        return response()->json($fullYearData, 200);
     }
 }
