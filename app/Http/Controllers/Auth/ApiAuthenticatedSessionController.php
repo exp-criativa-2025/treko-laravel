@@ -13,8 +13,56 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
+/**
+ * @OA\Info(
+ * title="Auth",
+ * version="1.0"
+ * )
+ */
+
+/**
+ * @OA\Tag(
+ * name="Auth",
+ * description="Operações de registro relacionadas à autenticação de usuários"
+ * )
+ *
+ * @OA\Schema(
+ * schema="User",
+ * type="object",
+ * title="User",
+ * required={"id", "name", "email", "token"},
+ * @OA\Property(property="id", type="integer", example=1),
+ * @OA\Property(property="name", type="string", example="John Doe"),
+ * @OA\Property(property="email", type="string", format="email", example="john.doe@example.com"),
+ * @OA\Property(property="cpf", type="string", example="123.456.789-00"),
+ * @OA\Property(property="phone", type="string", example="+55 11 91234-5678"),
+ * @OA\Property(property="password", type="string", format="password", example="password123"),
+ * )
+ */
+
 class ApiAuthenticatedSessionController extends Controller
 {
+    /**
+     * @OA\Post(
+     * path="/api/register",
+     * tags={"Register"},
+     * summary="Registra um novo usuário",
+     * @OA\RequestBody(
+     * required=true,
+     * @OA\JsonContent(
+     * ref="#/components/schemas/User"
+     * )
+     * ),
+     * @OA\Response(
+     * response=201,
+     * description="Usuário registrado com sucesso",
+     * @OA\JsonContent(
+     * @OA\Property(property="data", ref="#/components/schemas/User"),
+     * @OA\Property(property="message", type="string", example="Registro realizado com sucesso")
+     * )
+     * ),
+     * )
+     */
     public function register(Request $request): JsonResponse
     {
         // Register User
@@ -30,6 +78,28 @@ class ApiAuthenticatedSessionController extends Controller
         ]);
     }
 
+
+    /**
+     * @OA\Post(
+     * path="/api/login",
+     * tags={"Login"},
+     * summary="Realiza o login do usuário",
+     * @OA\RequestBody(
+     * required=true,
+     * @OA\JsonContent(
+     * ref="#/components/schemas/User"
+     * )
+     * ),
+     * @OA\Response(
+     * response=200,
+     * description="Usuário autenticado com sucesso",
+     * @OA\JsonContent(
+     * @OA\Property(property="data", ref="#/components/schemas/User"),
+     * @OA\Property(property="message", type="string", example="Você fez login")
+     * )
+     * )
+     * )
+     */
     public function login(Request $request): JsonResponse
     {
         // Login User
@@ -53,9 +123,34 @@ class ApiAuthenticatedSessionController extends Controller
         ]);
     }
 
+    /**
+     * @OA\Post(
+     * path="/api/logout",
+     * tags={"Logout"},
+     * summary="Realiza o logout do usuário",
+     * security={{"bearerAuth":{}}},
+     * @OA\Response(
+     * response=200,
+     * description="Usuário desconectado com sucesso",
+     * @OA\JsonContent(
+     * @OA\Property(property="message", type="string", example="Você fez logout")
+     * )
+     * ),
+     * @OA\Response(
+     * response=401,
+     * description="Não autorizado",
+     * @OA\JsonContent(
+     * @OA\Property(property="message", type="string", example="Não autorizado")
+     * )
+     * )
+     * )
+     */
     public function logout(Request $request): JsonResponse
     {
-        $request->user()->currentAccessToken()->delete();
+
+        $user = $request->user();
+
+        $user->currentAccessToken()->delete();
 
         return response()->json([
             'message' => __('Você fez logout'),
