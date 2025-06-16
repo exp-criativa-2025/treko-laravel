@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rule;
 
 /**
  * @OA\Tag(
@@ -127,24 +130,57 @@ class UserController extends Controller
      *     )
      * )
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request)
     {
-        $user = User::find($id);
+        $user = User::find($request->route('id'));
 
-        if (!$user) {
-            return response()->json(['message' => 'Usuário não encontrado'], 404);
+        $validatedData = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => [
+                'required',
+                'string',
+                'email',
+                'max:255',
+                Rule::unique('users')->ignore($user->id),
+            ],
+            'phone' => 'nullable|string|max:20',
+            'location' => 'nullable|string|max:255',
+            'bio' => 'nullable|string|max:1000',
+            'avatar' => 'nullable|string',
+        ]);
+
+        // 3. Lógica para tratar o avatar (se um novo foi enviado)
+        // O frontend envia uma string base64, que começa com "data:image..."
+        if ($request->filled('avatar') && Str::startsWith($request->avatar, 'data:image')) {
+            // Se o usuário já tiver um avatar, remove o arquivo antigo
+            if ($user->avatar && Storage::disk('public')->exists($user->avatar)) {
+                Storage::disk('public')->delete($user->avatar);
+            }
+
+            @list($type, $file_data) = explode(';', $request->avatar);
+            @list(, $file_data) = explode(',', $file_data);
+            @list(, $extension) = explode('/', $type);
+
+            $file_data = base64_decode($file_data);
+
+            // Gera um nome de arquivo único
+            $fileName = 'avatars/' . Str::random(20) . '.' . $extension;
+
+            // Salva o novo arquivo
+            Storage::disk('public')->put($fileName, $file_data);
+
+            // Adiciona o caminho do novo avatar aos dados validados
+            $validatedData['avatar'] = $fileName;
+        } else {
+            unset($validatedData['avatar']);
         }
 
-        $data = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|max:255|unique:users,email,' . $id,
-            'phone' => 'nullable|string|max:20',
-            'cpf' => 'nullable|string|max:14',
-            'role' => 'required|string|in:user,admin,superadmin',
-        ]);
-        $user->update($data);
 
-        return response()->json($user);
+        // 4. Atualizar o usuário no banco de dados
+        $user->update($validatedData);
+
+
+        return response()->json($user->fresh());
     }
 
     /**
@@ -185,4 +221,6 @@ class UserController extends Controller
 
         return response()->json(['message' => 'Usuário deletado com sucesso']);
     }
+
+
 }

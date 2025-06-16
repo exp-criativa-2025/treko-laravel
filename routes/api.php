@@ -12,7 +12,7 @@ Route::middleware(['api'])->group(function () {
 
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/user', function (Request $request) {
-            return $request->user();
+        return $request->user();
     });
 
     Route::post('/logout', [App\Http\Controllers\Auth\ApiAuthenticatedSessionController::class, 'logout'])
@@ -31,10 +31,16 @@ Route::middleware(['auth:sanctum'])->group(function () {
         ->name('api.users.index');
     Route::get('/users/{id}', [App\Http\Controllers\UserController::class, 'show'])
         ->name('api.users.show');
+
     Route::put('/users/{id}', [App\Http\Controllers\UserController::class, 'update'])
         ->name('api.users.update');
+        
     Route::delete('/users/{id}', [App\Http\Controllers\UserController::class, 'destroy'])
         ->name('api.users.destroy');
+
+    Route::middleware('auth')->get('/me', function (Request $request) {
+        return $request->user();
+    });
 });
 
 //rotas de entidades acadêmicas

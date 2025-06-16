@@ -9,6 +9,8 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasPermissions;
 use Spatie\Permission\Traits\HasRoles;
+use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Support\Facades\Storage;
 
 class User extends Authenticatable
 {
@@ -24,9 +26,12 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'phone',
+        'phone',    
         'cpf',
         'role',
+        'bio',
+        'avatar',
+        'location',
     ];
 
     /**
@@ -51,5 +56,21 @@ class User extends Authenticatable
             'password' => 'hashed',
             'role' => UserRole::class,
         ];
+    }
+
+        protected function avatar(): Attribute
+    {
+        return Attribute::make(
+            get: function ($value) {
+                // Se o valor no banco ($value) existir, cria a URL pública.
+                // A função Storage::url() gera o caminho correto, ex: /storage/avatars/arquivo.png
+                if ($value) {
+                    return Storage::url($value);
+                }
+
+                // Se não houver avatar, retorne uma URL de um avatar padrão/placeholder.
+                return 'https://ui-avatars.com/api/?name=' . urlencode($this->name) . '&background=random';
+            }
+        );
     }
 }
