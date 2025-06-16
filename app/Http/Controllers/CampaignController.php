@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Auth;
  * )
  */
 
- /**
+/**
  * @OA\Tag(
  *     name="Campaigns",
  *     description="Operações relacionadas a campanhas"
@@ -41,7 +41,7 @@ class CampaignController extends Controller
         $this->campaign = new Campaign();
     }
 
-     /**
+    /**
      * @OA\Get(
      *     path="/api/campaigns",
      *     tags={"Campaigns"},
@@ -59,14 +59,15 @@ class CampaignController extends Controller
      */
     public function index()
     {
-        $campaigns = $this->campaign->whereHas('academicEntity', function($query) {
-            $query->where('user_id', Auth::id());
-        })->get();
-        
+        $campaigns = $this->campaign
+            ->with('academicEntity')
+            ->withSum('donations as total_donations', 'donated')  // add this line
+            ->get();
+
         return response()->json($campaigns, 200);
     }
 
-    
+
     /**
      * @OA\Post(
      *     path="/api/campaigns",
@@ -130,7 +131,7 @@ class CampaignController extends Controller
         //
     }
 
-        /**
+    /**
      * @OA\Delete(
      *     path="/api/campaigns/{id}",
      *     tags={"Campaigns"},
