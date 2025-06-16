@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\AcademicEntity;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 /**
@@ -56,7 +57,7 @@ class AcademicEntityController extends Controller
      */
     public function index()
     {
-        $academicEntities = $this->academicEntity->where('user_id', Auth::id())->get();
+        $academicEntities = AcademicEntity::all();
         return response()->json($academicEntities, 200);  
 
     }
@@ -90,17 +91,25 @@ class AcademicEntityController extends Controller
      * )
      */
     public function store(Request $request)
-    {
-         $validatedData = $request->validate([
+    {   
+        $representativeUser = User::find(Auth::id());
+
+        if ($representativeUser->role->value !== 'representative') {
+            return response()->json(['message' => 'Acesso não autorizado.'], 403);
+        }
+
+
+        $validatedData = $request->validate([
             'type' => 'required|string|max:255',
             'fantasy_name' => 'required|string|max:255',
             'cnpj' => 'required|string|max:255|unique:academic_entities',
             'foundation_date' => 'required|date',
             'status' => 'required|string|max:255',
             'cep' => 'required|string|max:255',
-            'user_id' => 'required|exists:users,id'
         ], ['cnpj.unique' => 'O CNPJ informado já está cadastrado.']
         );
+
+
 
         $validatedData['user_id'] = Auth::id();
 
