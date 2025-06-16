@@ -152,7 +152,8 @@ class UserController extends Controller
      *             @OA\Property(property="email", type="string", example="joao@email.com"),
      *             @OA\Property(property="phone", type="string", example="(11) 91234-5678"),
      *             @OA\Property(property="cpf", type="string", example="123.456.789-00"),
-     *             @OA\Property(property="role", type="string", example="user")
+     *             @OA\Property(property="role", type="string", example="user"),
+     *             @OA\Property(property="avatar", type="string", format="url", example="https://supabase.co/storage/v1/object/public/user-images/avatar.jpg", description="Remote avatar image URL")
      *         )
      *     ),
      *     @OA\Response(
@@ -163,6 +164,10 @@ class UserController extends Controller
      *     @OA\Response(
      *         response=404,
      *         description="Usuário não encontrado"
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Invalid image URL provided"
      *     )
      * )
      */
@@ -190,44 +195,74 @@ class UserController extends Controller
             'role' => [
                 'required',
                 'string',
-                Rule::in(UserRole::values()), 
+                Rule::in(UserRole::values()),
             ],
             'bio' => 'nullable|string|max:1000',
-            'avatar' => 'nullable|string',
+            'avatar' => 'nullable|string|url|max:500', // Changed to accept URL
         ]);
 
-        // 3. Lógica para tratar o avatar (se um novo foi enviado)
-        // O frontend envia uma string base64, que começa com "data:image..."
-        if ($request->filled('avatar') && Str::startsWith($request->avatar, 'data:image')) {
-            // Se o usuário já tiver um avatar, remove o arquivo antigo
-            if ($user->avatar && Storage::disk('public')->exists($user->avatar)) {
-                Storage::disk('public')->delete($user->avatar);
+        // Handle avatar URL (remote URL from Supabase or other services)
+        if ($request->filled('avatar')) {
+            if ($this->isValidImageUrl($request->avatar)) {
+                // If user had a local avatar file, remove it since we're switching to URL
+                if ($user->avatar && !filter_var($user->avatar, FILTER_VALIDATE_URL) && Storage::disk('public')->exists($user->avatar)) {
+                    Storage::disk('public')->delete($user->avatar);
+                }
+
+                // Store the remote URL directly
+                $validatedData['avatar'] = $request->avatar;
+            } else {
+                return response()->json([
+                    'message' => 'Invalid image URL provided',
+                    'errors' => ['avatar' => ['The provided URL is not a valid image URL']]
+                ], 422);
             }
-
-            @list($type, $file_data) = explode(';', $request->avatar);
-            @list(, $file_data) = explode(',', $file_data);
-            @list(, $extension) = explode('/', $type);
-
-            $file_data = base64_decode($file_data);
-
-            // Gera um nome de arquivo único
-            $fileName = 'avatars/' . Str::random(20) . '.' . $extension;
-
-            // Salva o novo arquivo
-            Storage::disk('public')->put($fileName, $file_data);
-
-            // Adiciona o caminho do novo avatar aos dados validados
-            $validatedData['avatar'] = $fileName;
         } else {
             unset($validatedData['avatar']);
         }
 
-
-        // 4. Atualizar o usuário no banco de dados
+        // Update the user in the database
         $user->update($validatedData);
 
-
         return response()->json($user->fresh());
+    }
+
+    /**
+     * Validate if the provided URL is a valid image URL
+     */
+    private function isValidImageUrl(string $url): bool
+    {
+        // Basic URL validation
+        if (!filter_var($url, FILTER_VALIDATE_URL)) {
+            return false;
+        }
+
+        // Check if URL has valid image extension or is from trusted domains
+        $allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'];
+        $allowedDomains = [
+            'supabase.co',
+            'amazonaws.com',
+            'cloudinary.com',
+            'imgur.com',
+            'gravatar.com',
+            'ui-avatars.com'
+        ];
+
+        $urlParts = parse_url($url);
+        $host = $urlParts['host'] ?? '';
+
+        // Check if it's from an allowed domain
+        foreach ($allowedDomains as $domain) {
+            if (str_contains($host, $domain)) {
+                return true;
+            }
+        }
+
+        // Check file extension
+        $path = $urlParts['path'] ?? '';
+        $extension = strtolower(pathinfo($path, PATHINFO_EXTENSION));
+
+        return in_array($extension, $allowedExtensions);
     }
 
     /**
