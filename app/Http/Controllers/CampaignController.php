@@ -119,8 +119,12 @@ class CampaignController extends Controller
      * Display the specified resource.
      */
     public function show(Campaign $campaign)
+
     {
-        //
+        // should have the donations sum also
+        $campaign->load('academicEntity')
+            ->loadSum('donations as total_donations', 'donated');
+        return response()->json($campaign, 200);
     }
 
     /**
