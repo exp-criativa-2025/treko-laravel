@@ -6,6 +6,8 @@ use App\Models\Campaign;
 use App\Models\AcademicEntity;
 use Illuminate\Database\Seeder;
 
+use function PHPSTORM_META\map;
+
 class CampaignSeeder extends Seeder
 {
     /**
@@ -24,5 +26,13 @@ class CampaignSeeder extends Seeder
                 'academic_entity_id' => $entity->id,
             ]);
         }
+            //mock
+            Campaign::create([
+                'name' => 'Mês do agasalho',
+                'goal' => fake()->randomFloat(2, 1000, 100000),
+                'start_date' => now(),
+                'end_date' => now()->addMonths(1),
+                'academic_entity_id' => 1
+            ]);
     }
 }
