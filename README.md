@@ -1,62 +1,139 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+---
 
-## About Laravel
+# 📦 Treko - Backend
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+Projeto desenvolvido com [Laravel](https://laravel.com/) e utilizando [Laravel Sail](https://laravel.com/docs/sail) para ambiente de desenvolvimento containerizado.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## ✨ Tecnologias Utilizadas
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+* [Laravel](https://laravel.com/)
+* [Laravel Sail](https://laravel.com/docs/sail)
+* [MySQL](https://www.mysql.com/) via Docker
+* [PHP 8.3](https://www.php.net/)
+* [Redis](https://redis.io/) (opcional)
+* [Mailpit](https://github.com/axllent/mailpit) (opcional para testes de email)
 
-## Learning Laravel
+## 🚀 Como Rodar o Projeto
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+### Pré-requisitos
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+* Docker
+* Docker Compose (ou apenas Docker Desktop atualizado)
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+Repositório do frontend disponível em: [https://github.com/exp-criativa-2025/web-frontend](https://github.com/exp-criativa-2025/web-frontend)
 
-## Laravel Sponsors
+### Instalação
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+Clone o repositório:
 
-### Premium Partners
+```bash
+git clone https://github.com/exp-criativa-2025/treko-laravel.git
+```
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+Acesse a pasta do projeto:
 
-## Contributing
+```bash
+cd treko-laravel
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+Copie o arquivo de ambiente:
 
-## Code of Conduct
+```bash
+cp .env.example .env
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+Suba os containers do projeto com o Sail:
 
-## Security Vulnerabilities
+```bash
+./vendor/bin/sail up -d
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+Instale as dependências do PHP:
 
-## License
+```bash
+./vendor/bin/sail composer install
+```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
-# treko-laravel
+Gere a key da aplicação:
+
+```bash
+./vendor/bin/sail artisan key:generate
+```
+
+Rode as migrations:
+
+```bash
+./vendor/bin/sail artisan migrate
+```
+
+Rode o seeder na database:
+
+```bash
+./vendor/bin/sail artisan db:seed
+```
+
+### Execução em Ambiente de Desenvolvimento
+
+```bash
+./vendor/bin/sail up
+```
+
+Acesse a aplicação em: [http://localhost](http://localhost)
+
+### Testes
+
+```bash
+./vendor/bin/sail artisan test
+```
+
+## 🛠️ Estrutura Padrão do Projeto
+
+```
+.
+├── app/
+├── bootstrap/
+├── config/
+├── database/
+├── public/
+├── resources/
+├── routes/
+├── tests/
+├── docker-compose.yml
+├── sail
+├── .env
+├── composer.json
+└── README.md
+```
+
+## ✅ Funcionalidades
+
+* 🔐 API com autenticação via Sanctum
+* 📄 CRUD completo para os módulos do sistema
+* 📨 Integração com sistema de emails (via Mailpit)
+* ⚙️ Migrations e seeders
+* 🐳 Ambiente dockerizado com Sail
+
+## 📚 Comandos Úteis
+
+| Comando                             | Descrição                                      |
+| ----------------------------------- | ---------------------------------------------- |
+| `./vendor/bin/sail up -d`           | Sobe os containers em background               |
+| `./vendor/bin/sail artisan migrate` | Roda as migrations                             |
+| `./vendor/bin/sail artisan test`    | Executa os testes                              |
+| `./vendor/bin/sail npm run dev`     | Compila os assets (se usar frontend integrado) |
+
+## 📦 Deploy
+
+O projeto pode ser facilmente deployado em servidores que suportam Docker ou diretamente em plataformas como DigitalOcean, utilizando o mesmo ambiente configurado no Sail.
+
+---
+
+## ✍️ Autores
+
+* **Pedro Sudario** - [@petersudario](https://github.com/petersudario)
+* **Enzo Enrico** - [@enzoenrico](https://github.com/enzoenrico)
+* **Guilherme Sampaio** - [@guiguitatu](https://github.com/guiguitatu)
+* **Laura Santos** - [@kyoulau](https://github.com/kyoulau)
+
+---
