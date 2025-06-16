@@ -26,7 +26,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'phone',    
+        'phone',
         'cpf',
         'role',
         'bio',
@@ -58,17 +58,21 @@ class User extends Authenticatable
         ];
     }
 
-        protected function avatar(): Attribute
+    protected function avatar(): Attribute
     {
         return Attribute::make(
             get: function ($value) {
-                // Se o valor no banco ($value) existir, cria a URL pública.
-                // A função Storage::url() gera o caminho correto, ex: /storage/avatars/arquivo.png
-                if ($value) {
+                // If the value is already a URL (remote avatar), return it directly
+                if ($value && filter_var($value, FILTER_VALIDATE_URL)) {
+                    return $value;
+                }
+
+                // If the value is a local file path, create the storage URL
+                if ($value && Storage::disk('public')->exists($value)) {
                     return Storage::url($value);
                 }
 
-                // Se não houver avatar, retorne uma URL de um avatar padrão/placeholder.
+                // If no avatar, return a default placeholder
                 return 'https://ui-avatars.com/api/?name=' . urlencode($this->name) . '&background=random';
             }
         );
