@@ -73,14 +73,14 @@ class DonationController extends Controller
                         ->from('campaigns')
                         ->whereIn('academic_entity_id', $academicEntities);
                 })
-                ->orderBy('date', 'desc')
+                ->orderBy('created_at', 'desc')
                 ->get();
 
             return response()->json($donations, 200);
         }
 
         $donations = Donation::with(['user', 'campaign.academicEntity'])
-            ->orderBy('date', 'desc')
+            ->orderBy('created_at', 'desc')
             ->get();
         return response()->json($donations, 200);
     }
@@ -120,7 +120,6 @@ class DonationController extends Controller
     {
         $validatedData = $request->validate([
             'donated' => 'required|numeric|min:0.01',
-            'date' => 'required|date',
             'campaign_id' => 'required|exists:campaigns,id'
         ], [
             'donated.min' => 'O valor deve ser positivo.',
@@ -171,6 +170,8 @@ class DonationController extends Controller
         if ($donation->user_id !== Auth::id()) {
             return response()->json(['message' => 'Acesso não autorizado.'], 403);
         }
+
+        
 
         return response()->json($donation, 200);
     }
@@ -338,9 +339,9 @@ class DonationController extends Controller
         $year = Carbon::now()->year;
 
         $donations = DB::table('donations')
-            ->select(DB::raw('DATE(date) as date'), DB::raw('SUM(donated) as total'))
-            ->whereYear('date', $year)
-            ->groupBy(DB::raw('DATE(date)'))
+            ->select(DB::raw('DATE(created_at) as date'), DB::raw('SUM(donated) as total'))
+            ->whereYear('created_at', $year)
+            ->groupBy(DB::raw('DATE(created_at)'))
             ->orderBy('date')
             ->pluck('total', 'date');
 
