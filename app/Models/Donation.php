@@ -2,20 +2,21 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Donation extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
         'donated',
-        'date',
         'user_id',
         'campaign_id'
     ];
 
     protected $casts = [
-        'date' => 'datetime',
         'donated' => 'float'
     ];
 

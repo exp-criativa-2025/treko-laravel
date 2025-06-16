@@ -116,7 +116,28 @@ class CampaignController extends Controller
     }
 
     /**
-     * Display the specified resource.
+     * @OA\Get(
+     *     path="/api/campaigns/{id}",
+     *     tags={"Campaigns"},
+     *     summary="Exibe uma campanha específica",
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="ID da campanha",
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Detalhes da campanha",
+     *         @OA\JsonContent(ref="#/components/schemas/Campaign")
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Campanha não encontrada"
+     *     ),
+     *     security={{"bearerAuth":{}}}
+     * )
      */
     public function show(Campaign $campaign)
 

@@ -20,10 +20,11 @@ class DonationSeeder extends Seeder
         foreach ($campaigns as $campaign) {
             for ($i = 0; $i < 50; $i++) {
                 $user = $users->random();
-
+                $date = fake()->dateTimeBetween('2025-01-01', '2025-12-31');
                 Donation::create([
                     'donated' => fake()->randomFloat(2, 10, 1000),
-                    'date' => now(),
+                    'created_at' => $date,
+                    'updated_at' => $date,
                     'user_id' => $user->id,
                     'campaign_id' => $campaign->id,
                 ]);

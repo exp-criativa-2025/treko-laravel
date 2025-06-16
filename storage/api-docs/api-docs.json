@@ -227,19 +227,69 @@
                 ]
             }
         },
-        "/api/register": {
+        "/api/users": {
+            "get": {
+                "tags": [
+                    "UserAPI"
+                ],
+                "summary": "Lista todos os usuários",
+                "operationId": "getUsers",
+                "responses": {
+                    "200": {
+                        "description": "Lista de usuários",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/UserAPI"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
             "post": {
                 "tags": [
-                    "Register"
+                    "UserAPI"
                 ],
-                "summary": "Registra um novo usuário",
-                "operationId": "a423c4da10ef6b5139a6bb79081927e0",
+                "summary": "Registrar um novo usuário",
+                "operationId": "918593fc212b4e8509c4e80f0e766a21",
                 "requestBody": {
                     "required": true,
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/User"
+                                "required": [
+                                    "name",
+                                    "email",
+                                    "password"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "João da Silva"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "example": "joao@email.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "example": "senha_secreta"
+                                    },
+                                    "password_confirmation": {
+                                        "type": "string",
+                                        "example": "senha_secreta"
+                                    }
+                                },
+                                "type": "object"
                             }
                         }
                     }
@@ -250,13 +300,20 @@
                         "content": {
                             "application/json": {
                                 "schema": {
+                                    "$ref": "#/components/schemas/UserAPI"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Erro de validação",
+                        "content": {
+                            "application/json": {
+                                "schema": {
                                     "properties": {
-                                        "data": {
-                                            "$ref": "#/components/schemas/User"
-                                        },
                                         "message": {
                                             "type": "string",
-                                            "example": "Registro realizado com sucesso"
+                                            "example": "Erro de validação."
                                         }
                                     },
                                     "type": "object"
@@ -355,20 +412,6 @@
                 ]
             }
         },
-        "/api/users": {
-            "get": {
-                "tags": [
-                    "Users"
-                ],
-                "summary": "Get list of users",
-                "operationId": "19e3a765b6d0a9d1dabaa7e1f6b9f08b",
-                "responses": {
-                    "200": {
-                        "description": "Successful operation"
-                    }
-                }
-            }
-        },
         "/api/campaigns": {
             "get": {
                 "tags": [
@@ -459,6 +502,44 @@
             }
         },
         "/api/campaigns/{id}": {
+            "get": {
+                "tags": [
+                    "Campaigns"
+                ],
+                "summary": "Exibe uma campanha específica",
+                "operationId": "0f74cc63090e3f9d520d77776391f420",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID da campanha",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Detalhes da campanha",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Campaign"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Campanha não encontrada"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
             "delete": {
                 "tags": [
                     "Campaigns"
@@ -824,6 +905,171 @@
                     }
                 }
             }
+        },
+        "/api/users/{id}": {
+            "get": {
+                "tags": [
+                    "UserAPI"
+                ],
+                "summary": "Obtém um usuário específico",
+                "operationId": "getUser",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID do usuário",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Usuário encontrado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UserAPI"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Acesso não autorizado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Acesso não autorizado."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Usuário não encontrado"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "UserAPI"
+                ],
+                "summary": "Atualizar um usuário",
+                "operationId": "updateUser",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID do usuário",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "email",
+                                    "role"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "João da Silva"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "example": "joao@email.com"
+                                    },
+                                    "phone": {
+                                        "type": "string",
+                                        "example": "(11) 91234-5678"
+                                    },
+                                    "cpf": {
+                                        "type": "string",
+                                        "example": "123.456.789-00"
+                                    },
+                                    "role": {
+                                        "type": "string",
+                                        "example": "user"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Usuário atualizado com sucesso",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UserAPI"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Usuário não encontrado"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "UserAPI"
+                ],
+                "summary": "Deletar um usuário",
+                "operationId": "deleteUser",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID do usuário",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Usuário deletado com sucesso",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Usuário deletado com sucesso"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Usuário não encontrado"
+                    }
+                }
+            }
         }
     },
     "components": {
@@ -999,6 +1245,55 @@
                     }
                 },
                 "type": "object"
+            },
+            "UserAPI": {
+                "required": [
+                    "id",
+                    "name",
+                    "email",
+                    "phone",
+                    "cpf",
+                    "role"
+                ],
+                "properties": {
+                    "id": {
+                        "description": "ID do usuário",
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "name": {
+                        "description": "Nome do usuário",
+                        "type": "string"
+                    },
+                    "email": {
+                        "description": "Email do usuário",
+                        "type": "string",
+                        "format": "email"
+                    },
+                    "phone": {
+                        "description": "Telefone do usuário",
+                        "type": "string"
+                    },
+                    "cpf": {
+                        "description": "CPF do usuário",
+                        "type": "string"
+                    },
+                    "role": {
+                        "description": "Função do usuário",
+                        "type": "string"
+                    },
+                    "created_at": {
+                        "description": "Data de criação do usuário",
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "description": "Data de atualização do usuário",
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
             }
         }
     },
@@ -1012,8 +1307,8 @@
             "description": "Operações relacionadas a campanhas"
         },
         {
-            "name": "Register",
-            "description": "Register"
+            "name": "UserAPI",
+            "description": "UserAPI"
         },
         {
             "name": "Login",
@@ -1022,10 +1317,6 @@
         {
             "name": "Logout",
             "description": "Logout"
-        },
-        {
-            "name": "Users",
-            "description": "Users"
         },
         {
             "name": "Donations",

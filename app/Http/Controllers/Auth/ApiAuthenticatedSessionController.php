@@ -44,23 +44,31 @@ class ApiAuthenticatedSessionController extends Controller
 {
     /**
      * @OA\Post(
-     * path="/api/register",
-     * tags={"Register"},
-     * summary="Registra um novo usuário",
-     * @OA\RequestBody(
-     * required=true,
-     * @OA\JsonContent(
-     * ref="#/components/schemas/User"
-     * )
-     * ),
-     * @OA\Response(
-     * response=201,
-     * description="Usuário registrado com sucesso",
-     * @OA\JsonContent(
-     * @OA\Property(property="data", ref="#/components/schemas/User"),
-     * @OA\Property(property="message", type="string", example="Registro realizado com sucesso")
-     * )
-     * ),
+     *     path="/api/users",
+     *     tags={"UserAPI"},
+     *     summary="Registrar um novo usuário",
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"name", "email", "password"},
+     *             @OA\Property(property="name", type="string", example="João da Silva"),
+     *             @OA\Property(property="email", type="string", example="joao@email.com"),
+     *             @OA\Property(property="password", type="string", example="senha_secreta"),
+     *             @OA\Property(property="password_confirmation", type="string", example="senha_secreta")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="Usuário registrado com sucesso",
+     *         @OA\JsonContent(ref="#/components/schemas/UserAPI")
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Erro de validação",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Erro de validação.")
+     *         )
+     *     )
      * )
      */
     public function register(Request $request): JsonResponse

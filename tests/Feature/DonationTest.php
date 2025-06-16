@@ -2,56 +2,98 @@
 
 namespace Tests\Feature;
 
-use App\Models\AcademicEntity;
 use App\Models\User;
-use App\Models\Campaign; 
+use App\Models\Campaign;
+use App\Models\Donation;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
-class DonationTest extends TestCase
+class DonationControllerTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_user_can_create_donation()
-{
-    // 1. Cria o usuário
-    $user = User::factory()->create();
-    
-    // 2. Cria a entidade acadêmica (com todos os campos obrigatórios)
-    $academicEntity = AcademicEntity::factory()->create([
-        'user_id' => $user->id // Associa ao usuário criado
-    ]);
-    
-    // 3. Cria a campanha vinculada à entidade acadêmica
-    $campaign = Campaign::factory()->create([
-        'academic_entity_id' => $academicEntity->id,
-        'name' => 'Campanha de Livros',
-        'goal' => 5000,
-        'start_date' => now(),
-        'end_date' => now()->addMonth()
-    ]);
+    public function test_authenticated_user_can_create_donation()
+    {
+        $user = User::factory()->create();
+        $campaign = Campaign::factory()->create();
 
-    // 4. Faz a doação
-    $response = $this->actingAs($user)->postJson('/api/donations', [
-        'donated' => 100.50,
-        'date' => now()->toDateTimeString(),
-        'campaign_id' => $campaign->id
-    ]);
+        $payload = [
+            'donated' => 150.00,
+            'campaign_id' => $campaign->id,
+        ];
 
-    // 5. Verificações
-    $response->assertStatus(201)
-            ->assertJson([
-                'donated' => 100.50,
-                'user_id' => $user->id,
-                'campaign_id' => $campaign->id
-            ]);
-    
-    // Verifica se a doação foi realmente criada no banco
-    $this->assertDatabaseHas('donations', [
-        'donated' => 100.50,
-        'user_id' => $user->id
-    ]);
-}
+        $response = $this->actingAs($user)->postJson('/api/donations', $payload);
 
-    // Adicione outros testes para listar, mostrar, atualizar e deletar
+        $response->assertStatus(201)
+                 ->assertJsonFragment([
+                     'donated' => 150.00,
+                     'campaign_id' => $campaign->id,
+                     'user_id' => $user->id,
+                 ]);
+
+        $this->assertDatabaseHas('donations', [
+            'donated' => 150.00,
+            'campaign_id' => $campaign->id,
+            'user_id' => $user->id,
+        ]);
+    }
+
+    public function test_authenticated_user_can_list_own_donations()
+    {
+        $user = User::factory()->create();
+        $otherUser = User::factory()->create();
+        $campaign = Campaign::factory()->create();
+
+        // Donations from the authenticated user
+        Donation::factory()->create([
+            'user_id' => $user->id,
+            'campaign_id' => $campaign->id,
+            'donated' => 200.00,
+        ]);
+
+        // Donation from another user (should still appear, depending on role)
+        Donation::factory()->create([
+            'user_id' => $otherUser->id,
+            'campaign_id' => $campaign->id,
+            'donated' => 300.00,
+        ]);
+
+        $response = $this->actingAs($user)->getJson('/api/donations');
+
+        $response->assertStatus(200)
+                 ->assertJsonFragment(['donated' => 200.00])
+                 ->assertJsonFragment(['donated' => 300.00]); // If admin, both will appear. If representative, you might need role check.
+    }
+
+    public function test_user_cannot_create_donation_with_invalid_data()
+    {
+        $user = User::factory()->create();
+
+        $payload = [
+            'donated' => -50,
+            'campaign_id' => 999 // Non-existing campaign
+        ];
+
+        $response = $this->actingAs($user)->postJson('/api/donations', $payload);
+
+        $response->assertStatus(422)
+                 ->assertJsonValidationErrors(['donated', 'campaign_id']);
+    }
+
+    public function test_user_cannot_view_others_donation()
+    {
+        $user = User::factory()->create();
+        $otherUser = User::factory()->create();
+        $campaign = Campaign::factory()->create();
+
+        $donation = Donation::factory()->create([
+            'user_id' => $otherUser->id,
+            'campaign_id' => $campaign->id,
+            'donated' => 100,
+        ]);
+
+        $response = $this->actingAs($user)->getJson("/api/donations/{$donation->id}");
+
+        $response->assertStatus(403);
+    }
 }

@@ -26,6 +26,15 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     Route::post('/change-password', [App\Http\Controllers\Auth\ApiAuthenticatedSessionController::class, 'changePassword'])
         ->name('api.change-password');
+
+    Route::get('/users', [App\Http\Controllers\UserController::class, 'index'])
+        ->name('api.users.index');
+    Route::get('/users/{id}', [App\Http\Controllers\UserController::class, 'show'])
+        ->name('api.users.show');
+    Route::put('/users/{id}', [App\Http\Controllers\UserController::class, 'update'])
+        ->name('api.users.update');
+    Route::delete('/users/{id}', [App\Http\Controllers\UserController::class, 'destroy'])
+        ->name('api.users.destroy');
 });
 
 //rotas de entidades acadêmicas
