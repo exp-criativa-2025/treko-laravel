@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\UserRole;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
@@ -47,8 +50,28 @@ class UserController extends Controller
      */
     public function index()
     {
+        $currentUser = User::find(Auth::id());
+
         $users = User::all();
-        return response()->json($users);
+
+        if ($currentUser->role->value == "admin") {
+            return response()->json($users);
+        }
+
+        // Para não admin, ocultar cpf e phone
+        $usersFiltered = $users->map(function ($user) {
+            return [
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'role' => $user->role,
+                'created_at' => $user->created_at,
+                'updated_at' => $user->updated_at,
+                // cpf e phone omitidos
+            ];
+        });
+
+        return response()->json($usersFiltered);
     }
 
     /**
@@ -86,10 +109,23 @@ class UserController extends Controller
 
     public function show(string $id)
     {
+        $currentUser = User::find(Auth::id());
         $user = User::find($id);
 
         if (!$user) {
             return response()->json(['message' => 'Usuário não encontrado'], 404);
+        }
+
+        // Se o usuário não for admin, oculta cpf e phone
+        if (!$currentUser || $currentUser->role !== 'admin') {
+            $user = $user->only([
+                'id',
+                'name',
+                'email',
+                'role',
+                'created_at',
+                'updated_at',
+            ]);
         }
 
         return response()->json($user);
@@ -145,6 +181,17 @@ class UserController extends Controller
             ],
             'phone' => 'nullable|string|max:20',
             'location' => 'nullable|string|max:255',
+            'cpf' => [
+                'nullable',
+                'string',
+                'max:14',
+                Rule::unique('users')->ignore($user->id),
+            ],
+            'role' => [
+                'required',
+                'string',
+                Rule::in(UserRole::values()), 
+            ],
             'bio' => 'nullable|string|max:1000',
             'avatar' => 'nullable|string',
         ]);
@@ -221,6 +268,4 @@ class UserController extends Controller
 
         return response()->json(['message' => 'Usuário deletado com sucesso']);
     }
-
-
 }
